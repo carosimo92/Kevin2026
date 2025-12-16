@@ -14,14 +14,7 @@ export const extractGid = (input: string) => {
 export const fetchDriveData = async (url: string, isExcelMode: boolean): Promise<Subscription[]> => {
     const fileId = extractFileId(url);
     const gid = extractGid(url);
-    const apiKey = process.env.API_KEY;
-
-    if (!fileId) throw new Error("ID File non trovato.");
-
-    let response;
-    let data: Subscription[] | null = null;
-
-    // STRATEGIA 1: GVIZ (Public Export - CSV)
+    // Use process.env.API_KEY as per 
     if (!isExcelMode) {
         const gidParam = gid ? `&gid=${gid}` : '';
         const csvUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:csv${gidParam}`;
@@ -42,7 +35,7 @@ export const fetchDriveData = async (url: string, isExcelMode: boolean): Promise
 
     // STRATEGIA 2: Drive API (Fallback)
     if (!data || data.length === 0) {
-        if (!apiKey) throw new Error("API Key mancante per il metodo fallback.");
+        if (!apiKey) throw new Error("API Key mancante. Configura process.env.API_KEY.");
 
         if (isExcelMode) {
              const mediaUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
