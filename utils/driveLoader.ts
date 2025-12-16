@@ -14,7 +14,15 @@ export const extractGid = (input: string) => {
 export const fetchDriveData = async (url: string, isExcelMode: boolean): Promise<Subscription[]> => {
     const fileId = extractFileId(url);
     const gid = extractGid(url);
-    // Use process.env.API_KEY as per 
+    const apiKey = process.env.API_KEY;
+
+    if (!fileId) throw new Error("ID File non trovato.");
+
+    let response;
+    let data: Subscription[] | null = null;
+
+    // STRATEGIA 1: GVIZ (Public Export - CSV)
+    // Usata solo se non siamo in modalità Excel puro e proviamo a prendere i dati come CSV
     if (!isExcelMode) {
         const gidParam = gid ? `&gid=${gid}` : '';
         const csvUrl = `https://docs.google.com/spreadsheets/d/${fileId}/gviz/tq?tqx=out:csv${gidParam}`;
@@ -23,7 +31,7 @@ export const fetchDriveData = async (url: string, isExcelMode: boolean): Promise
             response = await fetch(csvUrl);
             if (response.ok) {
                 const textData = await response.text();
-                // Check if response is actually HTML (error page)
+                // Check if response is actually HTML (error page) - Google returns HTML on error for GVIZ endpoints
                 if (textData && !textData.trim().startsWith('<!DOCTYPE') && !textData.trim().startsWith('<html')) {
                     data = parseExcelData(textData);
                 }
@@ -33,7 +41,8 @@ export const fetchDriveData = async (url: string, isExcelMode: boolean): Promise
         }
     }
 
-    // STRATEGIA 2: Drive API (Fallback)
+    // STRATEGIA 2: Drive API (Fallback o Modalità Excel)
+    // Se la strategia 1 ha fallito o non è stata eseguita (data è ancora null o vuoto)
     if (!data || data.length === 0) {
         if (!apiKey) throw new Error("API Key mancante. Configura process.env.API_KEY.");
 
