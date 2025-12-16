@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Lock, User, ChevronRight, ScanLine, UserPlus, ArrowLeft } from 'lucide-react';
+import { ShieldCheck, Lock, User, ChevronRight, ScanLine, UserPlus, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
@@ -9,6 +9,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -82,6 +83,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
     setError('');
     setUsername('');
     setPassword('');
+    setShowPassword(false);
   };
 
   return (
@@ -149,16 +151,28 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                   <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   // Attributi critici per mobile
                   autoCapitalize="none"
                   autoComplete="current-password"
                   autoCorrect="off"
-                  className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-black/40 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 sm:text-sm font-mono transition-all"
+                  className="block w-full pl-10 pr-10 py-3 border border-white/10 rounded-lg bg-black/40 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 sm:text-sm font-mono transition-all"
                   placeholder="••••••••"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500 hover:text-cyan-400 transition-colors"
+                  aria-label={showPassword ? "Nascondi password" : "Mostra password"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -199,7 +213,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
             
             {!isRegistering && (
                 <p className="text-gray-700 text-[10px] font-mono mt-3">
-                
+                (Default: admin / admin)
                 </p>
             )}
           </div>
