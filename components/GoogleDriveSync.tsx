@@ -91,7 +91,7 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
 
   if (showConfig || !fileUrl) {
     return (
-      <div className="bg-gray-900/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-6 h-full flex flex-col justify-center relative overflow-hidden group min-h-[300px]">
+      <div className="bg-gray-900/80 backdrop-blur-xl border border-cyan-500/30 rounded-2xl p-6 h-full flex flex-col justify-center relative overflow-hidden group min-h-[350px]">
          <div className="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl" />
 
         <h3 className="text-xl font-display font-bold text-white mb-4 flex items-center gap-2 relative z-10">
@@ -99,25 +99,27 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
         </h3>
         
         <div className="space-y-4 relative z-10">
-          <div className="space-y-1">
-            <label className="text-[10px] font-bold text-gray-400 uppercase flex items-center gap-1">
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-gray-400 uppercase flex items-center gap-1">
               <LinkIcon className="w-3 h-3" /> Incolla Link Google Drive
             </label>
             <input 
               type="text" 
               value={fileUrl} 
               onChange={handleUrlChange}
-              className={`w-full bg-black/50 border rounded px-3 py-3 text-sm text-white outline-none font-mono placeholder-gray-600 transition-all ${errorMsg ? 'border-red-500/50 focus:border-red-500' : 'border-white/10 focus:border-cyan-500'}`}
-              placeholder="https://docs.google.com/spreadsheets/..."
+              className={`w-full bg-black/50 border rounded-lg px-4 py-4 text-base text-white outline-none font-mono placeholder-gray-600 transition-all ${errorMsg ? 'border-red-500/50 focus:border-red-500' : 'border-white/10 focus:border-cyan-500'}`}
+              placeholder="Incolla qui il link..."
+              autoCapitalize="none"
+              autoComplete="off"
             />
             
-            <div className="flex items-center gap-2 mt-2">
+            <div className="flex flex-col gap-2 mt-3">
                 <button 
                    onClick={() => setIsExcelMode(!isExcelMode)}
-                   className={`text-[10px] px-2 py-1 rounded border transition-colors flex items-center gap-1 ${isExcelMode ? 'bg-green-900/30 border-green-500 text-green-400' : 'bg-gray-800 border-gray-600 text-gray-400'}`}
+                   className={`text-xs px-3 py-2 rounded-lg border transition-colors flex items-center gap-2 w-full justify-center ${isExcelMode ? 'bg-green-900/30 border-green-500 text-green-400' : 'bg-gray-800/50 border-gray-600 text-gray-400'}`}
                 >
-                    {isExcelMode ? <CheckCircle2 className="w-3 h-3"/> : <div className="w-3 h-3 rounded-full border border-gray-500" />}
-                    Modalità Excel Caricato (.xlsx)
+                    {isExcelMode ? <CheckCircle2 className="w-4 h-4"/> : <div className="w-4 h-4 rounded-full border border-gray-500" />}
+                    <span>Modalità Excel Caricato (.xlsx)</span>
                 </button>
             </div>
 
@@ -131,10 +133,11 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
             )}
             
             <div className="mt-2 p-3 bg-blue-950/30 border border-blue-500/20 rounded text-[11px] leading-relaxed text-blue-100/80">
-              <p className="font-bold text-blue-300 mb-1">IMPORTANTE:</p>
+              <p className="font-bold text-blue-300 mb-1">ISTRUZIONI RAPIDE:</p>
               <ul className="list-disc pl-4 space-y-1 text-blue-200/70">
-                 <li>Il file deve essere <strong>Google Sheet</strong> o <strong>Excel (.xlsx)</strong>.</li>
-                 <li>Assicurati che la condivisione sia su: <strong>"Chiunque abbia il link"</strong>.</li>
+                 <li>Vai su Google Drive (App o Sito).</li>
+                 <li>Copia il link del file Excel/Sheet.</li>
+                 <li>Incolla qui sopra e premi Connetti.</li>
               </ul>
             </div>
           </div>
@@ -142,14 +145,14 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
           <button 
             onClick={saveConfig}
             disabled={loading}
-            className="w-full mt-2 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded font-bold text-white transition-all shadow-lg shadow-cyan-900/20 active:scale-95 text-xs tracking-widest uppercase flex items-center justify-center gap-2 disabled:opacity-50"
+            className="w-full mt-2 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 rounded-lg font-bold text-white transition-all shadow-lg shadow-cyan-900/20 active:scale-95 text-sm tracking-widest uppercase flex items-center justify-center gap-2 disabled:opacity-50"
           >
-             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-             {loading ? 'Connetti Cloud' : 'Salva e Connetti'}
+             {loading ? <RefreshCw className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+             {loading ? 'Connessione...' : 'SALVA E CONNETTI'}
           </button>
           
           {fileUrl && !showConfig && (
-            <button onClick={() => setShowConfig(false)} className="w-full text-xs text-gray-500 hover:text-white py-2">Indietro</button>
+            <button onClick={() => setShowConfig(false)} className="w-full text-xs text-gray-500 hover:text-white py-3">Annulla</button>
           )}
         </div>
       </div>
@@ -162,15 +165,15 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
       <div className="relative w-full h-full min-h-[300px] p-8 border border-cyan-500/20 rounded-2xl bg-cyan-950/10 backdrop-blur-sm hover:bg-cyan-950/20 transition-all duration-500 flex flex-col items-center justify-center gap-4 text-center">
         
         <div className="absolute top-4 right-4 z-20 flex gap-2">
-             <button onClick={clearConfig} className="p-2 hover:bg-white/10 rounded-full text-red-500/50 hover:text-red-400 transition-colors" title="Rimuovi Link Salvato">
-                <Trash2 className="w-4 h-4" />
+             <button onClick={clearConfig} className="p-3 hover:bg-white/10 rounded-full text-red-500/50 hover:text-red-400 transition-colors" title="Rimuovi Link Salvato">
+                <Trash2 className="w-5 h-5" />
             </button>
-            <button onClick={() => setShowConfig(true)} className="p-2 hover:bg-white/10 rounded-full text-cyan-500/50 hover:text-cyan-400 transition-colors" title="Modifica Link">
-                <Settings className="w-4 h-4" />
+            <button onClick={() => setShowConfig(true)} className="p-3 hover:bg-white/10 rounded-full text-cyan-500/50 hover:text-cyan-400 transition-colors" title="Modifica Link">
+                <Settings className="w-5 h-5" />
             </button>
         </div>
 
-        <div className="relative z-10 p-4 rounded-full bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)] group-hover:scale-110 transition-transform duration-300">
+        <div className="relative z-10 p-5 rounded-full bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.2)] group-hover:scale-110 transition-transform duration-300">
           {loading ? <RefreshCw className="w-12 h-12 text-cyan-400 animate-spin" /> : <Cloud className="w-12 h-12 text-cyan-400" />}
         </div>
         
@@ -187,7 +190,7 @@ export const GoogleDriveSync: React.FC<GoogleDriveSyncProps> = ({ onDataLoaded }
           <button 
             onClick={() => handleSync()}
             disabled={loading}
-            className="w-full py-3 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-bold text-white shadow-lg shadow-cyan-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm flex items-center justify-center gap-2"
+            className="w-full py-4 px-6 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-bold text-white shadow-lg shadow-cyan-500/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider text-sm flex items-center justify-center gap-2"
           >
             {loading ? 'Caricamento...' : 'Avvia Dashboard'}
           </button>
