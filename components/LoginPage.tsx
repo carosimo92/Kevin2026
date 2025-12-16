@@ -27,7 +27,11 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   const handleRegister = () => {
-    if (!username.trim() || !password.trim()) {
+    // Pulisce gli spazi vuoti accidentali (comuni su mobile)
+    const cleanUser = username.trim();
+    const cleanPass = password.trim();
+
+    if (!cleanUser || !cleanPass) {
       setError('ERROR // DATI MANCANTI');
       setIsLoading(false);
       return;
@@ -35,13 +39,14 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
 
     const storedUsers = JSON.parse(localStorage.getItem('ktv_users') || '[]');
     
-    if (storedUsers.some((u: any) => u.username === username)) {
+    // Verifica case-insensitive per evitare duplicati tipo "Kevin" e "kevin"
+    if (storedUsers.some((u: any) => u.username.toLowerCase() === cleanUser.toLowerCase())) {
       setError('ERROR // UTENTE GIÀ ESISTENTE');
       setIsLoading(false);
       return;
     }
 
-    const newUser = { username, password };
+    const newUser = { username: cleanUser, password: cleanPass };
     localStorage.setItem('ktv_users', JSON.stringify([...storedUsers, newUser]));
     
     setIsLoading(false);
@@ -52,9 +57,17 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   const handleLogin = () => {
+    // Pulisce input
+    const inputUser = username.trim();
+    const inputPass = password.trim();
+
     const storedUsers = JSON.parse(localStorage.getItem('ktv_users') || '[]');
-    const userFound = storedUsers.find((u: any) => u.username === username && u.password === password);
-    const isDefaultAdmin = username === 'admin' && password === 'admin';
+    
+    // Cerca nel DB locale (Case sensitive per sicurezza, tranne admin)
+    const userFound = storedUsers.find((u: any) => u.username === inputUser && u.password === inputPass);
+    
+    // Admin default: Case insensitive per username, ma password 'admin' minuscola
+    const isDefaultAdmin = inputUser.toLowerCase() === 'admin' && inputPass === 'admin';
 
     if (isDefaultAdmin || userFound) {
       onLogin();
@@ -116,9 +129,13 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
+                  // Attributi critici per mobile: no maiuscole, no correttore
+                  autoCapitalize="none"
+                  autoComplete="username"
+                  autoCorrect="off"
+                  spellCheck="false"
                   className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-black/40 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 sm:text-sm font-mono transition-all"
                   placeholder={isRegistering ? "CREATE USERNAME" : "USERNAME"}
-                  autoComplete="off"
                 />
               </div>
             </div>
@@ -135,6 +152,10 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  // Attributi critici per mobile
+                  autoCapitalize="none"
+                  autoComplete="current-password"
+                  autoCorrect="off"
                   className="block w-full pl-10 pr-3 py-3 border border-white/10 rounded-lg bg-black/40 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 sm:text-sm font-mono transition-all"
                   placeholder="••••••••"
                 />
