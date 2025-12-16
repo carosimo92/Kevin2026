@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Lock, User, ChevronRight, ScanLine, UserPlus, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, Lock, User, ChevronRight, ScanLine, UserPlus, ArrowLeft, Eye, EyeOff, CheckSquare, Square } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
@@ -10,8 +10,26 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Carica credenziali salvate all'avvio
+  useEffect(() => {
+    const savedCreds = localStorage.getItem('ktv_saved_creds');
+    if (savedCreds) {
+        try {
+            const parsed = JSON.parse(savedCreds);
+            if (parsed.u && parsed.p) {
+                setUsername(parsed.u);
+                setPassword(parsed.p);
+                setRememberMe(true);
+            }
+        } catch (e) {
+            console.error("Errore lettura credenziali salvate", e);
+        }
+    }
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,10 +70,6 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(false);
     setIsRegistering(false);
     
-    // NON resettiamo i campi, così l'utente può cliccare subito Login
-    // setUsername(''); 
-    // setPassword('');
-    
     alert('IDENTITY VERIFIED // UTENTE CREATO. PREMI LOGIN PER ACCEDERE.');
   };
 
@@ -72,12 +86,18 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
     );
     
     // 2. Admin Default (Username Case Insensitive, Password flessibile per mobile)
-    // Accetta 'admin' o 'Admin' come password per facilitare l'accesso da mobile
     const isDefaultAdmin = 
       inputUser.toLowerCase() === 'admin' && 
       (inputPass === 'admin' || inputPass === 'Admin');
 
     if (isDefaultAdmin || userFound) {
+      // GESTIONE RICORDAMI
+      if (rememberMe) {
+          localStorage.setItem('ktv_saved_creds', JSON.stringify({ u: inputUser, p: inputPass }));
+      } else {
+          localStorage.removeItem('ktv_saved_creds');
+      }
+      
       onLogin();
     } else {
       setError('ACCESS DENIED // CREDENZIALI ERRATE');
@@ -88,8 +108,8 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   const toggleMode = () => {
     setIsRegistering(!isRegistering);
     setError('');
-    setUsername('');
-    setPassword('');
+    // Non cancelliamo username/password se stiamo solo cambiando modalità, 
+    // ma resettiamo errori e show password
     setShowPassword(false);
   };
 
@@ -180,6 +200,23 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                 </button>
               </div>
             </div>
+
+            {/* Remember Me Checkbox (Only for Login) */}
+            {!isRegistering && (
+                <div 
+                    onClick={() => setRememberMe(!rememberMe)}
+                    className="flex items-center gap-2 cursor-pointer group w-fit"
+                >
+                    {rememberMe ? (
+                        <CheckSquare className="w-5 h-5 text-cyan-400" />
+                    ) : (
+                        <Square className="w-5 h-5 text-gray-600 group-hover:text-cyan-400/50 transition-colors" />
+                    )}
+                    <span className={`text-xs font-bold font-mono tracking-wider ${rememberMe ? 'text-cyan-300' : 'text-gray-500 group-hover:text-gray-400'}`}>
+                        MEMORIZZA CREDENZIALI
+                    </span>
+                </div>
+            )}
 
             {error && (
               <div className="flex items-center gap-2 text-red-400 text-xs font-mono bg-red-950/30 p-3 rounded border border-red-500/30 animate-pulse">
