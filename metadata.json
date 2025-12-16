@@ -1,0 +1,5 @@
+{
+  "name": "Kevin TV",
+  "description": "Un gestore di abbonamenti futuristico che analizza i file Excel per monitorare le scadenze e fornire insight intelligenti tramite Gemini AI.",
+  "requestFramePermissions": []
+}
