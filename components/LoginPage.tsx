@@ -28,7 +28,6 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
   };
 
   const handleRegister = () => {
-    // Pulisce gli spazi vuoti accidentali (comuni su mobile)
     const cleanUser = username.trim();
     const cleanPass = password.trim();
 
@@ -40,7 +39,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
 
     const storedUsers = JSON.parse(localStorage.getItem('ktv_users') || '[]');
     
-    // Verifica case-insensitive per evitare duplicati tipo "Kevin" e "kevin"
+    // Check esistenza utente (Case Insensitive)
     if (storedUsers.some((u: any) => u.username.toLowerCase() === cleanUser.toLowerCase())) {
       setError('ERROR // UTENTE GIÀ ESISTENTE');
       setIsLoading(false);
@@ -52,23 +51,31 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
     
     setIsLoading(false);
     setIsRegistering(false);
-    setUsername('');
-    setPassword('');
-    alert('IDENTITY VERIFIED // UTENTE CREATO CON SUCCESSO');
+    
+    // NON resettiamo i campi, così l'utente può cliccare subito Login
+    // setUsername(''); 
+    // setPassword('');
+    
+    alert('IDENTITY VERIFIED // UTENTE CREATO. PREMI LOGIN PER ACCEDERE.');
   };
 
   const handleLogin = () => {
-    // Pulisce input
     const inputUser = username.trim();
     const inputPass = password.trim();
 
     const storedUsers = JSON.parse(localStorage.getItem('ktv_users') || '[]');
     
-    // Cerca nel DB locale (Case sensitive per sicurezza, tranne admin)
-    const userFound = storedUsers.find((u: any) => u.username === inputUser && u.password === inputPass);
+    // 1. Cerca Utenti Custom (Username Case Insensitive, Password Case Sensitive)
+    const userFound = storedUsers.find((u: any) => 
+      u.username.toLowerCase() === inputUser.toLowerCase() && 
+      u.password === inputPass
+    );
     
-    // Admin default: Case insensitive per username, ma password 'admin' minuscola
-    const isDefaultAdmin = inputUser.toLowerCase() === 'admin' && inputPass === 'admin';
+    // 2. Admin Default (Username Case Insensitive, Password flessibile per mobile)
+    // Accetta 'admin' o 'Admin' come password per facilitare l'accesso da mobile
+    const isDefaultAdmin = 
+      inputUser.toLowerCase() === 'admin' && 
+      (inputPass === 'admin' || inputPass === 'Admin');
 
     if (isDefaultAdmin || userFound) {
       onLogin();
@@ -131,7 +138,6 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  // Attributi critici per mobile: no maiuscole, no correttore
                   autoCapitalize="none"
                   autoComplete="username"
                   autoCorrect="off"
@@ -154,7 +160,6 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  // Attributi critici per mobile
                   autoCapitalize="none"
                   autoComplete="current-password"
                   autoCorrect="off"
