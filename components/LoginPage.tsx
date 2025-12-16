@@ -199,7 +199,7 @@ export const LoginPage: React.FC<LoginProps> = ({ onLogin }) => {
             
             {!isRegistering && (
                 <p className="text-gray-700 text-[10px] font-mono mt-3">
-                (Default: admin / admin)
+                
                 </p>
             )}
           </div>
