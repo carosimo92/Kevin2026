@@ -2,12 +2,9 @@ import { GoogleGenAI } from "@google/genai";
 import { Subscription } from "../types";
 
 export const analyzeSubscriptions = async (subscriptions: Subscription[]): Promise<string> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API Key not found. Please provide a valid API Key.");
-  }
-
-  const ai = new GoogleGenAI({ apiKey });
+  // Use process.env.API_KEY as per Google GenAI SDK guidelines
+  // Assume process.env.API_KEY is pre-configured and valid
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   // Simplify data for the prompt to save tokens
   const simplifiedData = subscriptions.map(s => ({
